@@ -128,6 +128,10 @@
             background: #fff3cd;
             font-weight: 600;
         }
+        td.token.input-char {
+            background: #d4edda;
+            color: #155724;
+        }
         .help {
             font-size: 12px;
             color: #666;
@@ -142,13 +146,14 @@
     <div class="container">
         <div class="input-section">
             <label for="input">Input String</label>
-            <input type="text" id="input" placeholder="e.g., baaba" value="baaba">
+            <input type="text" id="input" placeholder="e.g., abab" value="abab">
 
             <label for="grammar">Grammar (CNF)</label>
-            <textarea id="grammar" placeholder="S -> A B | a">S -> A B | B C
-A -> B A | a
-B -> C C | b
-C -> A B | a</textarea>
+            <textarea id="grammar" placeholder="S -> A B | a">S -> X Y
+X -> A B
+Y -> A B
+A -> a
+B -> b</textarea>
             <p class="help">Format: "S -> A B | a" (binary rules or terminals, one non-terminal per line)</p>
 
             <label for="start">Start Symbol</label>
@@ -228,32 +233,46 @@ C -> A B | a</textarea>
             }
             html += '</tr>';
 
-            // Table rows (CYK table is upper-triangular)
-            for (let i = 0; i < n; i++) {
+            // Table rows (bottom-up by span length)
+            // Top row = span n (full string), ..., row 1 = span 1 (single chars), row 0 = input chars
+            for (let span = n; span >= 1; span--) {
                 html += '<tr>';
-                html += `<td class="token">${i + 1}</td>`;
+                html += `<td class="token">${span}</td>`;
 
-                for (let j = 0; j < n; j++) {
-                    if (j < i) {
-                        // Below diagonal - empty
-                        html += '<td class="empty"></td>';
-                    } else {
-                        // On or above diagonal - show cell
-                        const cell = table[i][j];
-                        const content = cell.length > 0 ? cell.join(', ') : '';
-                        const hasContent = cell.length > 0 ? 'has-content' : '';
+                // Calculate how many cells in this row
+                const numCells = n - span + 1;
 
-                        // Top-right cell (full span)
-                        let topRight = '';
-                        if (i === 0 && j === n - 1) {
-                            topRight = accepted ? 'top-right' : 'top-right rejected';
-                        }
+                for (let cellIdx = 0; cellIdx < numCells; cellIdx++) {
+                    const i = cellIdx;
+                    const j = cellIdx + span - 1;
+                    const cell = table[i][j];
+                    const content = cell.length > 0 ? cell.join(', ') : '';
+                    const hasContent = cell.length > 0 ? 'has-content' : '';
 
-                        html += `<td class="cell ${hasContent} ${topRight}">${escapeHtml(content)}</td>`;
+                    // Top row, single cell (full span)
+                    let topRight = '';
+                    if (span === n) {
+                        topRight = accepted ? 'top-right' : 'top-right rejected';
                     }
+
+                    html += `<td class="cell ${hasContent} ${topRight}">${escapeHtml(content)}</td>`;
                 }
+
+                // Fill remaining cells with empty
+                for (let k = numCells; k < n; k++) {
+                    html += '<td class="empty"></td>';
+                }
+
                 html += '</tr>';
             }
+
+            // Row 0: actual input characters
+            html += '<tr>';
+            html += '<td class="token">0</td>';
+            for (let j = 0; j < n; j++) {
+                html += `<td class="token input-char">${escapeHtml(tokens[j])}</td>`;
+            }
+            html += '</tr>';
 
             html += '</table>';
             document.getElementById('table').innerHTML = html;
