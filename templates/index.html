@@ -101,7 +101,7 @@
             margin: 0 auto;
         }
         td {
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
             padding: 8px 12px;
             text-align: center;
             min-width: 60px;
@@ -114,12 +114,15 @@
         }
         td.cell {
             background: #fff;
+            border-color: #ddd;
         }
         td.cell.has-content {
             background: #e3f2fd;
         }
         td.cell.top-right {
-            border: 3px solid #28a745;
+            border-color: #28a745;
+            border-width: 3px;
+            padding: 7px 11px;
         }
         td.cell.top-right.rejected {
             border-color: #dc3545;
@@ -127,10 +130,12 @@
         td.token {
             background: #fff3cd;
             font-weight: 600;
+            border-color: #ddd;
         }
         td.token.input-char {
             background: #d4edda;
             color: #155724;
+            border-color: #ddd;
         }
         .help {
             font-size: 12px;
@@ -149,11 +154,11 @@
         }
         td.highlighted {
             background: #ffeb3b !important;
-            border: 2px solid #fbc02d !important;
+            border-color: #fbc02d !important;
         }
         td.source {
             background: #c8e6c9 !important;
-            border: 2px solid #66bb6a !important;
+            border-color: #66bb6a !important;
         }
         #arrow-overlay {
             position: absolute;
